@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCandidates, vote } from '../api';
-import { motion } from 'framer-motion';
+import { User, ChevronDown } from 'lucide-react';
 
 const VoteForm = () => {
     const [candidates, setCandidates] = useState([]);
@@ -12,6 +12,7 @@ const VoteForm = () => {
     });
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         loadCandidates();
@@ -27,7 +28,16 @@ const VoteForm = () => {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        // Reset candidate_id if position changes
+        if (e.target.name === 'position') {
+            setFormData({ ...formData, [e.target.name]: e.target.value, candidate_id: '' });
+        } else {
+            setFormData({ ...formData, [e.target.name]: e.target.value });
+        }
+    };
+
+    const handleCandidateSelect = (id) => {
+        setFormData({ ...formData, candidate_id: id });
     };
 
     const handleSubmit = async (e) => {
@@ -36,17 +46,27 @@ const VoteForm = () => {
         setError('');
 
         if (!formData.candidate_id) {
-            setError('Please select a candidate');
+            setError('Please select a candidate before submitting.');
             return;
         }
+
+        setIsSubmitting(true);
 
         try {
             await vote(formData);
             setMessage('Vote recorded successfully!');
-            setFormData({ ...formData, candidate_id: '' }); // Reset candidate selection
-            loadCandidates(); // Refresh votes count (optional, or just to sync)
+            // Reset form completely after successful vote
+            setFormData({
+                user_name: '',
+                admission_number: '',
+                position: '',
+                candidate_id: ''
+            });
+            setTimeout(() => setMessage(''), 5000); // Clear success message after 5 seconds
         } catch (err) {
             setError(err.response?.data?.error || 'Voting failed');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -57,87 +77,150 @@ const VoteForm = () => {
     const positions = [...new Set(candidates.map(c => c.position))];
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-full max-w-md mx-auto mt-6 md:mt-10 bg-white p-4 md:p-6 rounded-lg shadow-md"
-        >
-            <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center">Cast Your Vote</h2>
+        <div className="w-full max-w-[500px] mx-auto bg-white rounded-[24px] shadow-[0_8px_40px_-12px_rgba(0,0,0,0.08)] p-8 md:p-10 font-sans border border-slate-100/50">
+            <h2 className="text-[28px] font-[900] mb-8 text-center text-slate-800 tracking-tight">Cast Your Vote</h2>
 
-            {message && <div className="bg-green-100 text-green-700 p-3 mb-4 rounded">{message}</div>}
-            {error && <div className="bg-red-100 text-red-700 p-3 mb-4 rounded">{error}</div>}
+            {message && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl mb-6 flex items-center justify-center text-sm font-medium">
+                    {message}
+                </div>
+            )}
+            {error && (
+                <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl mb-6 flex items-center justify-center text-sm font-medium">
+                    {error}
+                </div>
+            )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
+
+                {/* Name Input */}
                 <div>
-                    <label className="block text-gray-700">Name</label>
+                    <label className="block text-slate-800 font-semibold text-sm mb-2 pl-1">Name</label>
                     <input
                         type="text"
                         name="user_name"
                         value={formData.user_name}
                         onChange={handleChange}
                         required
-                        className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter your full name"
+                        className="w-full border-2 border-blue-100 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700 placeholder:text-slate-400"
                     />
                 </div>
+
+                {/* Admission Number Input */}
                 <div>
-                    <label className="block text-gray-700">Admission Number</label>
+                    <label className="block text-slate-800 font-semibold text-sm mb-2 pl-1">Admission Number</label>
                     <input
                         type="text"
                         name="admission_number"
                         value={formData.admission_number}
                         onChange={handleChange}
                         required
-                        className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., A12345678"
+                        className="w-full border-2 border-blue-100 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700 placeholder:text-slate-400"
                     />
                 </div>
 
+                {/* Position Select */}
                 <div>
-                    <label className="block text-gray-700">Position</label>
-                    <select
-                        name="position"
-                        value={formData.position}
-                        onChange={handleChange}
-                        required
-                        className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="">Select Position</option>
-                        {positions.map((pos, idx) => (
-                            <option key={idx} value={pos}>{pos}</option>
-                        ))}
-                    </select>
-                </div>
-
-                {formData.position && (
-                    <div>
-                        <label className="block text-gray-700">Candidate</label>
+                    <label className="block text-slate-800 font-semibold text-sm mb-2 pl-1">Position</label>
+                    <div className="relative">
                         <select
-                            name="candidate_id"
-                            value={formData.candidate_id}
+                            name="position"
+                            value={formData.position}
                             onChange={handleChange}
                             required
-                            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border-2 border-blue-100 p-3 pr-10 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700 appearance-none bg-white cursor-pointer"
                         >
-                            <option value="">Select Candidate</option>
-                            {filteredCandidates.map(candidate => (
-                                <option key={candidate.id} value={candidate.id}>
-                                    {candidate.name}
-                                </option>
+                            <option value="" disabled>Select Position</option>
+                            {positions.map((pos, idx) => (
+                                <option key={idx} value={pos}>{pos}</option>
                             ))}
                         </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                            <ChevronDown size={18} strokeWidth={2.5} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Candidate Selection Grid */}
+                {formData.position && (
+                    <div className="pt-2 pb-2">
+                        <label className="block text-slate-800 font-semibold text-sm mb-3 pl-1">
+                            Candidates for {formData.position}
+                        </label>
+
+                        {filteredCandidates.length > 0 ? (
+                            <div className="grid grid-cols-2 gap-4">
+                                {filteredCandidates.map(candidate => {
+                                    const isSelected = formData.candidate_id === candidate.id;
+
+                                    return (
+                                        <div
+                                            key={candidate.id}
+                                            onClick={() => handleCandidateSelect(candidate.id)}
+                                            className={`
+                                                relative border-2 rounded-2xl p-5 flex flex-col items-center justify-center cursor-pointer transition-all duration-200
+                                                ${isSelected
+                                                    ? 'border-blue-500 bg-blue-50 shadow-[0_0_0_4px_rgba(59,130,246,0.1)]'
+                                                    : 'border-slate-100 hover:border-blue-200 hover:bg-slate-50'
+                                                }
+                                            `}
+                                        >
+                                            {/* Avatar Circle */}
+                                            <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                                                <User size={32} strokeWidth={1.5} />
+                                            </div>
+
+                                            {/* Candidate Name */}
+                                            <p className="font-semibold text-slate-800 text-center mb-4 line-clamp-2 min-h-[40px] flex items-center">
+                                                {candidate.name}
+                                            </p>
+
+                                            {/* Select Button Indicator */}
+                                            <button
+                                                type="button"
+                                                className={`
+                                                    w-full py-2 px-4 rounded-lg text-sm font-bold transition-colors
+                                                    ${isSelected
+                                                        ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                                                        : 'bg-white text-blue-600 border-2 border-blue-600 hover:bg-blue-50'
+                                                    }
+                                                `}
+                                            >
+                                                {isSelected ? 'Selected' : 'Select'}
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="text-center p-6 bg-slate-50 rounded-xl border border-slate-100 text-slate-500 text-sm">
+                                No candidates found for this position.
+                            </div>
+                        )}
                     </div>
                 )}
 
-                <motion.button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                >
-                    Vote
-                </motion.button>
+                {/* Submit Button */}
+                <div className="pt-4">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting || !formData.candidate_id}
+                        className={`
+                            w-full py-3.5 rounded-xl font-bold text-white transition-all
+                            ${isSubmitting || !formData.candidate_id
+                                ? 'bg-blue-300 cursor-not-allowed'
+                                : 'bg-[#4B93FF] hover:bg-blue-500 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 active:scale-[0.98]'
+                            }
+                        `}
+                    >
+                        {isSubmitting ? 'Submitting...' : 'Submit Vote'}
+                    </button>
+                </div>
+
             </form>
-        </motion.div>
+        </div>
     );
 };
 

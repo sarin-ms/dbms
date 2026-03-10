@@ -8,19 +8,28 @@ import ResultsView from './components/ResultsView';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<VoteForm />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/results" element={<ResultsView />} />
-          </Routes>
-        </main>
-        <footer className="bg-gray-800 text-white text-center py-4 mt-8">
-          &copy; {new Date().getFullYear()} Voting System. All rights reserved.
-        </footer>
-      </div>
+      <Routes>
+        {/* Admin Route outside the main layout */}
+        <Route path="/admin" element={<AdminPanel />} />
+
+        {/* All other routes wrapped in the main layout */}
+        <Route
+          path="/*"
+          element={
+            <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans">
+              <Navbar />
+              <main className="flex-grow flex items-center justify-center p-4">
+                <div className="w-full">
+                  <Routes>
+                    <Route path="/" element={<VoteForm />} />
+                    <Route path="/results" element={<ResultsView />} />
+                  </Routes>
+                </div>
+              </main>
+            </div>
+          }
+        />
+      </Routes>
     </Router>
   );
 }
