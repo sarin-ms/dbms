@@ -14,7 +14,7 @@ const Navbar = () => {
     ];
 
     return (
-        <nav className="bg-white w-full z-50">
+        <nav className="relative bg-white w-full z-50">
             <div className="container mx-auto px-6 md:px-12 flex justify-between items-center py-4">
 
                 <Link to="/" className="flex items-center space-x-3 group outline-none">
