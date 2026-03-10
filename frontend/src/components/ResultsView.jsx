@@ -94,17 +94,26 @@ const ResultsView = () => {
                         </div>
                     </div>
 
-                    <div className="bg-white border text-gray-800 p-5 rounded-lg shadow-sm border-l-4 border-l-purple-600 flex justify-between items-center transition-transform hover:-translate-y-1">
-                        <div>
-                            <h3 className="text-sm text-gray-500 font-medium mb-1">Leading Candidate</h3>
-                            <p className="text-2xl font-bold text-gray-800">
-                                {stats.leadingCandidate ? stats.leadingCandidate.name : 'N/A'}
-                            </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                                {stats.leadingCandidate ? `${stats.leadingCandidate.votes} votes` : ''}
-                            </p>
+                    <div className="bg-white border text-gray-800 p-5 rounded-lg shadow-sm border-l-4 border-l-purple-600 flex justify-between items-start transition-transform hover:-translate-y-1">
+                        <div className="w-full pr-4">
+                            <h3 className="text-sm text-gray-500 font-medium mb-3">Leading Candidates</h3>
+                            <div className="space-y-3">
+                                {Object.keys(groupedData).length > 0 ? (
+                                    Object.entries(groupedData).map(([pos, cands]) => (
+                                        <div key={pos} className="flex justify-between items-end border-b border-gray-100 pb-2 last:border-0 last:pb-0">
+                                            <div>
+                                                <p className="text-lg font-bold text-gray-800 leading-tight">{cands[0].name}</p>
+                                                <p className="text-xs text-gray-500">{pos}</p>
+                                            </div>
+                                            <span className="text-sm font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded">{cands[0].votes} {cands[0].votes === 1 ? 'vote' : 'votes'}</span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-2xl font-bold text-gray-800">N/A</p>
+                                )}
+                            </div>
                         </div>
-                        <div className="text-purple-600 p-3 bg-purple-50 rounded-lg">
+                        <div className="text-purple-600 p-3 bg-purple-50 rounded-lg shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trophy"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg>
                         </div>
                     </div>
