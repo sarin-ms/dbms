@@ -78,7 +78,7 @@ const AdminPanel = () => {
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-200 flex flex-col justify-between items-center font-sans tracking-wide">
+            <div className="min-h-screen bg-linear-to-br from-blue-100 to-blue-200 flex flex-col justify-between items-center font-sans tracking-wide">
                 <div className="flex-1 w-full flex items-center justify-center p-4">
                     <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-sm border border-gray-100">
                         <h2 className="text-3xl font-bold mb-8 text-center text-blue-900">Admin Login</h2>
@@ -150,7 +150,7 @@ const AdminPanel = () => {
             </header>
 
             {/* Main Content */}
-            <main className="flex-grow container mx-auto px-4 py-8 max-w-6xl">
+            <main className="grow container mx-auto px-4 py-8 max-w-6xl">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
 
                     <div className="border-b border-gray-100 bg-white p-6">
@@ -196,7 +196,6 @@ const AdminPanel = () => {
                                         <option value="" disabled>Select Position</option>
                                         <option value="Male Rep">Male Rep</option>
                                         <option value="Female Rep">Female Rep</option>
-                                        <option value="Class Rep">Class Rep</option>
                                     </select>
                                 </div>
 
@@ -233,7 +232,7 @@ const AdminPanel = () => {
                                                         <input
                                                             value={editForm.name}
                                                             onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                                            className="border border-gray-300 p-1.5 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-full min-w-[120px]"
+                                                            className="border border-gray-300 p-1.5 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-full min-w-30"
                                                         />
                                                     ) : candidate.name}
                                                 </td>
@@ -243,7 +242,7 @@ const AdminPanel = () => {
                                                         <input
                                                             value={editForm.position}
                                                             onChange={(e) => setEditForm({ ...editForm, position: e.target.value })}
-                                                            className="border border-gray-300 p-1.5 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-full min-w-[100px]"
+                                                            className="border border-gray-300 p-1.5 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 w-full min-w-25"
                                                         />
                                                     ) : (
                                                         <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getPositionPillColor(candidate.position)}`}>

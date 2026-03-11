@@ -116,7 +116,7 @@ const VoteForm = () => {
                         value={formData.admission_number}
                         onChange={handleChange}
                         required
-                        placeholder="e.g., A12345678"
+                        placeholder="e.g., CHN24AM001"
                         className="w-full border-2 border-blue-100 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700 placeholder:text-slate-400"
                     />
                 </div>
